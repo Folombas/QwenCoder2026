@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Интерактивный дашборд Москвы</title>
+  <meta name="description" content="Дашборд Москвы: точное время, актуальная погода и живая веб-камера центра города." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- Декоративный анимированный фон -->
+  <div class="backdrop" aria-hidden="true">
+    <span class="orb orb-1"></span>
+    <span class="orb orb-2"></span>
+    <span class="orb orb-3"></span>
+    <span class="grid-overlay"></span>
+  </div>
+
+  <main class="dashboard">
+    <!-- Шапка -->
+    <header class="hero reveal" style="--delay: 0ms">
+      <div class="hero-left">
+        <p class="eyebrow">
+          <span class="live-dot" aria-hidden="true"></span>
+          Live&nbsp;•&nbsp;55.7558&nbsp;N,&nbsp;37.6173&nbsp;E
+        </p>
+        <h1 class="title">Москва<span class="title-accent">.</span>&nbsp;<span class="title-sub">Интерактивный дашборд</span></h1>
+      </div>
+      <div class="hero-right">
+        <p class="tz-note">Часовой пояс:<br /><strong>Europe / Moscow (MSK)</strong></p>
+      </div>
+    </header>
+
+    <!-- Основная сетка -->
+    <section class="grid">
+      <!-- Блок времени -->
+      <article class="card card-time reveal" style="--delay: 120ms" aria-label="Время в Москве">
+        <div class="card-head">
+          <h2 class="card-title"><span class="card-icon" aria-hidden="true">🕒</span> Время в Москве</h2>
+          <span class="badge">Real-time</span>
+        </div>
+        <div class="clock-wrap">
+          <time id="clock-time" class="clock glow" datetime="">00:00:00</time>
+          <p id="clock-date" class="clock-date">Загрузка даты…</p>
+          <div class="clock-meta">
+            <span id="day-progress-label">Сегодня пройдено</span>
+            <div class="progress"><i id="day-progress" style="width: 0%"></i></div>
+            <span id="day-progress-value">0%</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- Блок погоды -->
+      <article class="card card-weather reveal" style="--delay: 240ms" aria-label="Погода в Москве">
+        <div class="card-head">
+          <h2 class="card-title"><span class="card-icon" aria-hidden="true">⛅</span> Погода</h2>
+          <span class="badge badge-src">Open-Meteo</span>
+        </div>
+
+        <!-- Лоадер -->
+        <div id="weather-loader" class="loader-box" role="status" aria-live="polite">
+          <div class="spinner" aria-hidden="true"></div>
+          <p class="loader-text">Загружаем погоду…</p>
+        </div>
+
+        <!-- Данные погоды (скрыты до загрузки) -->
+        <div id="weather-content" class="weather-content hidden" aria-hidden="true">
+          <div class="weather-top">
+            <span id="w-icon" class="w-icon pulse" aria-hidden="true">☀️</span>
+            <div class="w-temp-block">
+              <span id="w-temp" class="w-temp">—</span>
+              <span class="w-unit">°C</span>
+            </div>
+          </div>
+          <p id="w-desc" class="w-desc">—</p>
+
+          <ul class="w-stats">
+            <li class="stat">
+              <span class="stat-icon" aria-hidden="true">💧</span>
+              <div class="stat-body">
+                <span class="stat-label">Влажность</span>
+                <span class="stat-value"><b id="w-humidity">—</b>%</span>
+              </div>
+            </li>
+            <li class="stat">
+              <span class="stat-icon" aria-hidden="true">🌬️</span>
+              <div class="stat-body">
+                <span class="stat-label">Ветер</span>
+                <span class="stat-value"><b id="w-wind">—</b> км/ч</span>
+              </div>
+            </li>
+            <li class="stat">
+              <span class="stat-icon" aria-hidden="true">🌡️</span>
+              <div class="stat-body">
+                <span class="stat-label">Ощущается</span>
+                <span class="stat-value"><b id="w-feels">—</b> °C</span>
+              </div>
+            </li>
+          </ul>
+
+          <button id="w-refresh" class="btn ghost" type="button">↻ Обновить</button>
+        </div>
+
+        <!-- Ошибка -->
+        <div id="weather-error" class="error-box hidden" role="alert">
+          <p>😔 Не удалось загрузить погоду.</p>
+          <button id="w-retry" class="btn" type="button">Повторить запрос</button>
+        </div>
+      </article>
+
+      <!-- Блок веб-камеры -->
+      <article class="card card-camera reveal span-2" style="--delay: 360ms" aria-label="Веб-камера центра Москвы">
+        <div class="card-head">
+          <h2 class="card-title"><span class="card-icon" aria-hidden="true">📹</span>Live-камера: центр Москвы</h2>
+          <span class="badge badge-live"><span class="live-dot" aria-hidden="true"></span> LIVE</span>
+        </div>
+        <div class="video-frame">
+          <iframe
+            id="camera-frame"
+            src="https://www.youtube.com/embed/9833FlHNbdY?autoplay=1&mute=1&loop=1&playlist=9833FlHNbdY&controls=0&modestbranding=1&rel=0"
+            title="Круговая панорама Красной площади — live"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+            allowfullscreen
+            loading="lazy"
+          ></iframe>
+          <div class="video-fallback hidden" id="video-fallback">
+            <p>📡 Прямой эфир временно недоступен.<br />Попробуйте обновить страницу.</p>
+          </div>
+        </div>
+        <p class="hint">Совет: нажмите на видео, чтобы развернуть на весь экран. Если стрим офлайн — замените ID видео в файле <code>script.js</code> (константа <code>STREAMS</code>) на другой актуальный эфир.</p>
+      </article>
+    </section>
+
+    <!-- Подвал -->
+    <footer class="footer reveal" style="--delay: 480ms">
+      <p>Данные о времени: <code>Intl.DateTimeFormat("Europe/Moscow")</code> · Погода: <a href="https://open-meteo.com" target="_blank" rel="noopener">Open-Meteo API</a></p>
+      <p class="muted">Сделано с ❤️ на Vanilla JS · Glassmorphism UI</p>
+    </footer>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
